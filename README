@@ -1,0 +1,9 @@
+绑定域名
+################
+1. 向你的 Github Pages 仓库添加一个CNAME(一定要*大写*)文件其中只能包含一个顶级域名，像这样：example.com
+2. 向你的 DNS 配置中添加 3 条记录
+@          A             192.30.252.153
+@          A             192.30.252.154
+www      CNAME    wangjiangyong.github.io.
+
+https://www.zhihu.com/question/31377141?sort=created
