@@ -1,8 +1,0 @@
-数据处理过程
------------------
-![Alt text][./dp1.png]
-+ Question Phase 提出想要解决和回答的问题
-+ Wrangle Phase 数据加工，包括数据采集和清洗
-+ Explore Phase 数据探索，熟悉数据并找出模式
-+ Draw Conclusions Phase (or make predictions) 总结或者预测数据，需要统计或者机器学习等
-+ Communicate Phase 交流研究成果，博客，论文邮件... 数据可视化是比较有效的方法
