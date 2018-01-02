@@ -1,9 +1,10 @@
 ---
 layout: post
-title: "python2与python3区别汇总"
-category: Program
+title: "python2.x与3.x区别汇总"
+category: 编程
 tags: [Python]
 ---
+
 Python 的设计哲学 Explicit is better than implicit. 明着优于暗着。
 
 Python为了确保你能顺利过渡到新版本，特别提供了__future__模块，让你在旧的版本中试验新版本的一些特性。

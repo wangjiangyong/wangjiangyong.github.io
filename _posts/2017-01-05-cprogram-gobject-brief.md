@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "C Program GObject简介 "
-category: Program
+category: 编程
 tags: [C, OO]
 ---
 
