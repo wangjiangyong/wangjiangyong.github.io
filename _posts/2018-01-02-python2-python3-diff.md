@@ -20,3 +20,4 @@ Python 2.x与3.x的差别
 + True 和 False 在 Python2 中是两个全局变量，可以被修改。而在 Python3 中则是关键字，不能被修改。
 
 
+持续更新...
