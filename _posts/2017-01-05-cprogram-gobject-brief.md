@@ -112,6 +112,6 @@ struct DerivedObjectClass
 };
 ```
 
-###### 参考：
+#### 参考：
 https://en.wikibooks.org/wiki/C_Programming/GObject
 https://www.cs.rit.edu/~ats/books/ooc.pdf
