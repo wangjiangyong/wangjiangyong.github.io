@@ -4,7 +4,9 @@ title: "python2与python3区别汇总"
 category: Program
 tags: [Python]
 ---
+Python 的设计哲学 Explicit is better than implicit. 明着优于暗着
 
+Python为了确保你能顺利过渡到新版本，特别提供了__future__模块，让你在旧的版本中试验新版本的一些特性。
 
 Python 2.x与3.x的差别
 --------------------
@@ -17,5 +19,4 @@ Python 2.x与3.x的差别
 
 + True 和 False 在 Python2 中是两个全局变量，可以被修改。而在 Python3 中则是关键字，不能被修改。
 
-> Python 的设计哲学 Explicit is better than implicit. 明着优于暗着
-> Python为了确保你能顺利过渡到新版本，特别提供了__future__模块，让你在旧的版本中试验新版本的一些特性。
+
