@@ -76,12 +76,12 @@ life_expectancy.iloc[0]  # 注意位置和索引的区别。
 
 ##### 二维数据
 
-####### Python: List of lists
-####### NumPy: 2D array
+###### Python: List of lists
+###### NumPy: 2D array
 + 数组每个元素都是相同的数据类型，在处理CSV文件时候不方便。
 + axis=0时候，按照列来计算; axis=1时候，按照行来计算值.
 
-####### Pandas: DataFrame
+###### Pandas: DataFrame
 + 优于NumPy，每列可以保存不同数据类型。可以拥有列名。即可以使用位置定位元素，也可以使用index索引和column列名来定位元素
 
 ```python
