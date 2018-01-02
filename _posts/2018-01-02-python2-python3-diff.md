@@ -5,12 +5,14 @@ category: 编程
 tags: [Python]
 ---
 
+#### 介绍
+
 Python 的设计哲学 Explicit is better than implicit. 明着优于暗着。
 
 Python为了确保你能顺利过渡到新版本，特别提供了__future__模块，让你在旧的版本中试验新版本的一些特性。
 
-Python 2.x与3.x的差别
---------------------
+#### 2.x与3.x的差别
+
 + print()。
 + 除法 / 这种除法叫“地板除”， 2.7结果为整数，3.x为浮点数。Python 3.x中，所有的除法都是精确除法，地板除用//表示。
 + 2.x里的字符串用'xxx'表示str，Unicode字符串用u'xxx'表示unicode。而在3.x中，所有字符串都被视为unicode，因此，写u'xxx'和'xxx'是完全一致的。
