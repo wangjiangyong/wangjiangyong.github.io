@@ -1,7 +1,7 @@
 # Site settings
 title: "wjy's blog"
 url: "//tmpurl.pw"
-paginate: 5
+paginate: 3
 author:
     name: wjy
     github:
