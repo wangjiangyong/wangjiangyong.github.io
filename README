@@ -16,3 +16,14 @@ jeky11 将纯文本转化为静态网站和博客
 #################################
 https://www.jekyll.com.cn/
 
+Ruby 下载并安装包
+#############################
+https://rubyinstaller.org/downloads/
+gem install jekyll
+gem install jekyll-paginate
+gem install rake
+(jekyll >= 3.0.3 ,jekyll-paginate >= 1.1.0)
+
+rake介绍
+###############################
+http://blog.csdn.net/freehyan/article/details/51879554
