@@ -1,23 +1,21 @@
 ---
 layout: post
-title: "数据处理 brief"
+title: "使用Numpy/Pandas数据处理"
 category: 数据处理
 tags: [Data, Python, NumPy]
 ---
 
-数据处理过程
------------------
-![Alt text](https://raw.githubusercontent.com/wangjiangyong/wangjiangyong.github.io/master/images/dp1.png)
+#### 数据处理过程介绍
 
-+ Question Phase 提出想要解决和回答的问题
-+ Wrangle Phase 数据加工，包括数据采集和清洗
-+ Explore Phase 数据探索，熟悉数据并找出模式
-+ Draw Conclusions Phase (or make predictions) 总结或者预测数据，需要统计或者机器学习等
-+ Communicate Phase 交流研究成果，博客，论文邮件... 数据可视化是比较有效的方法
+1. Question Phase 提出想要解决和回答的问题
+2. Wrangle Phase 数据加工，包括数据采集和清洗
+3. Explore Phase 数据探索，熟悉数据并找出模式
+4. Draw Conclusions Phase (or make predictions) 总结或者预测数据，需要统计或者机器学习等
+5. Communicate Phase 交流研究成果，博客，论文邮件... 数据可视化是比较有效的方法
 
 
-一维数据np.array
--------------
+##### 一维数据np.array
+
 + NumPy Index Arrays
 
 ```Python
@@ -53,8 +51,8 @@ print a #array([100,2,3,4,5])  np.array 不同于python list 它是直接在原�
 
 ```
 
-一维数据pd.series
------------
+##### 一维数据pd.series
+
 + Pandas Series它与NumPy数组类似，功能更强大，它基于np.array。
 + Pandas数组可以设置index。NumPy array是增强型的Python List。Pandas Series是list和字典的杂交。
 + Pandas Series向量化运算需要index一直才行。如果没有内置函数处理series，可使用apply函数简化数据处理。
@@ -76,14 +74,14 @@ life_expectancy.iloc[0]  # 注意位置和索引的区别。
 
 
 
-二维数据
---------------
-###### Python: List of lists
-###### NumPy: 2D array
+##### 二维数据
+
+####### Python: List of lists
+####### NumPy: 2D array
 + 数组每个元素都是相同的数据类型，在处理CSV文件时候不方便。
 + axis=0时候，按照列来计算; axis=1时候，按照行来计算值.
 
-###### Pandas: DataFrame
+####### Pandas: DataFrame
 + 优于NumPy，每列可以保存不同数据类型。可以拥有列名。即可以使用位置定位元素，也可以使用index索引和column列名来定位元素
 
 ```python
