@@ -58,7 +58,7 @@ while True:
     #print(image.shape)
     proc2stream.stdin.write(image.tostring())
 ```
-
+管道：https://ffmpeg.org/ffmpeg-protocols.html#pipe
 参考：http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
      https://github.com/Zulko/moviepy/
 
