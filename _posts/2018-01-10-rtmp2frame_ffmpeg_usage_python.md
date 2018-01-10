@@ -20,8 +20,45 @@ tags: [Python, FFmpeg, Video]
 
 关键点是在Python3代码中，通过**Pipe(管道)来使外部ffmpeg程序读写视频帧**。
 
+```Python
+import subprocess as sp
+import numpy as np
+
+FFMPEG_BIN = "ffmpeg"
+
+command2 = [ FFMPEG_BIN,
+        '-y', # (optional) overwrite output file if it exists
+        '-f', 'rawvideo',     #-f fmt 强迫采用格式fmt
+        '-vcodec','rawvideo',
+        '-s', '960x540', # size of one frame
+        '-pix_fmt', 'rgb24',
+        '-r', '24', # frames per second
+        '-i', '-', # The imput comes from a pipe
+        '-an', # Tells FFMPEG not to expect any audio
+        #'-vcodec', 'libx264',
+        'output_video.flv' ]
+
+proc2stream = sp.Popen( command2, stdin=sp.PIPE,bufsize=10**8)
+
+command1 = [FFMPEG_BIN,
+           '-i', 'rtmp://192.168.26.223:1935/live/web123' , 
+           '-f', 'image2pipe', 
+           '-pix_fmt', 'rgb24',
+           '-vcodec', 'rawvideo', '-']
+
+proc2pics = sp.Popen(command1,stdout=sp.PIPE,bufsize=10**8)
+
+while True:
+    raw_image = proc2pics.stdout.read(960*540*3)
+    image = np.fromstring(raw_image,dtype='uint8')
+    #print(type(image))
+    #image = image.reshape((540,960,3))
+    #print(image.shape)
+    proc2stream.stdin.write(image.tostring())
+```
 
 参考：http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
+     https://github.com/Zulko/moviepy/
 
 
 
