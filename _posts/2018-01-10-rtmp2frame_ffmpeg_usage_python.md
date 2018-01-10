@@ -41,7 +41,7 @@ command2 = [ FFMPEG_BIN,
 proc2stream = sp.Popen( command2, stdin=sp.PIPE,bufsize=10**8)
 
 command1 = [FFMPEG_BIN,
-           '-i', 'rtmp://192.168.26.223:1935/live/web123' , 
+           '-i', 'rtmp://192.168.xxx.xxx:1935/live/livestream' , 
            '-f', 'image2pipe', 
            '-pix_fmt', 'rgb24',
            '-vcodec', 'rawvideo', '-']
