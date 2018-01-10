@@ -35,4 +35,5 @@ Markdown 图片&链接
 ![name](url)
 </div>
 
-![name][url]  链接 
+[文字][1]  或者  [文字](url) 链接 
+[1] url
