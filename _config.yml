@@ -1,16 +1,16 @@
 # Site settings
-title: "wjy's blog"
+title: "def wjy_blog"
 url: "//tmpurl.pw"
 paginate: 10
 author:
     name: wjy
     github:
-    email:
+    email:wjy.scu@gmail.com
     gitcafe:
     twitter:
     facebook:
     googleplus:
-    weibo:
+    weibo:https://weibo.com/zero7kdang
 atom_path: /atom.xml
 rss_path: /rss.xml
 
