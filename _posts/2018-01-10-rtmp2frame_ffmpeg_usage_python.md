@@ -59,9 +59,9 @@ while True:
     proc2stream.stdin.write(image.tostring())
 ```
 参考：
-> http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/     
-> https://ffmpeg.org/ffmpeg-protocols.html#pipe （管道）
-> https://github.com/Zulko/moviepy/
+1. http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/     
+2. https://ffmpeg.org/ffmpeg-protocols.html#pipe （管道）
+3. https://github.com/Zulko/moviepy/
 
 #### ffmpeg常用参数
 
