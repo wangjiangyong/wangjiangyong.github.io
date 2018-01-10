@@ -43,7 +43,7 @@ command2 = [ FFMPEG_BIN,
 proc2stream = sp.Popen( command2, stdin=sp.PIPE,bufsize=10**8)
 
 command1 = [FFMPEG_BIN,
-           '-i', 'rtmp://192.168.xxx.xxx:1935/live/livestream' , 
+           '-i', 'rtmp://192.168.xxx.xxx:1935/live/livestream1' , 
            '-f', 'image2pipe', 
            '-pix_fmt', 'rgb24',
            '-vcodec', 'rawvideo', '-']
@@ -58,6 +58,10 @@ while True:
     #print(image.shape)
     proc2stream.stdin.write(image.tostring())
 ```
+以上代码可实现从数据流提取数据帧，并将提取的帧写入output_video.flv文件。
+ffmpeg -re -i output_video.flv -f flv rtmp://192.168.xxx.xxx/live/livestream2 
+
+
 参考：
 1. http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/     
 2. https://ffmpeg.org/ffmpeg-protocols.html#pipe （管道）
