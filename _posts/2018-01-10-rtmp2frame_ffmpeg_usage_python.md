@@ -69,9 +69,9 @@ ffmpeg -re -i output_video.flv -f flv rtmp://192.168.xxx.xxx/live/livestream2
 3. https://github.com/Zulko/moviepy/
 
 #### ffmpeg常用参数
-
-ffmpeg [global_options] **{[input_file_options] -i input_url} ... {[output_file_options] output_url}** ...
-
+```bash
+ffmpeg [global_options] {[input_file_options] -i input_url} ... {[output_file_options] output_url} ...
+```
 **-f fmt (input/output)**
 
 Force input or output file format. The format is normally auto detected for input files and guessed from the file extension for output files, so this option is not needed in most cases.
