@@ -1,6 +1,7 @@
 ---
 layout: post
-title: "rtmp2frame_ffmpeg_usage_python"
-category: 
-tags: []
+title: "使用Python读写rtmp视频流处理方案"
+category: 视频
+tags: [Python, FFmpeg, Video]
 ---
+
