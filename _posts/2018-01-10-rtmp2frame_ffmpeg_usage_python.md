@@ -16,6 +16,8 @@ tags: [Python, FFmpeg, Video]
 
 #### 相关第三方库
 
+
+
 #### 可行方案
 
 关键点是在Python3代码中，通过**Pipe(管道)来使外部ffmpeg程序读写视频帧**。
@@ -60,6 +62,45 @@ while True:
 参考：http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
      https://github.com/Zulko/moviepy/
 
+#### ffmpeg常用参数
+
+ffmpeg [global_options] {[input_file_options] -i input_url} ... {[output_file_options] output_url} ...
+
+**-f fmt (input/output)**
+
+Force input or output file format. The format is normally auto detected for input files and guessed from the file extension for output files, so this option is not needed in most cases.
+
+**-vcodec codec (output)**
+
+Set the video codec. This is an alias for "-codec:v".
+
+**-s[:stream_specifier] size (input/output,per-stream)**
+
+Set frame size.
+
+**-pix_fmts**
+
+Show available pixel formats.
+
+
+**-pix_fmt[:stream_specifier] format (input/output,per-stream)**
+
+Set pixel format. Use "-pix_fmts" to show all the supported pixel formats.  If the selected pixel format can not be selected, 
+ffmpeg will print a warning and select the best pixel format supported by the encoder.  If pix_fmt is prefixed by a "+", 
+ffmpeg will exit with an error if the requested pixel format can not be selected, and automatic conversions inside filtergraphs are disabled.If pix_fmt is a single "+", ffmpeg selects the same pixel format as the input (or graph output) and automatic conversions are disabled.
+
+**-r[:stream_specifier] fps (input/output,per-stream)**
+
+Set frame rate (Hz value, fraction or abbreviation).
+
+**-i url (input)**
+
+input file url
+
+
+**-an (output)**
+
+Disable audio recording.
 
 
 
