@@ -1,5 +1,5 @@
 # Site settings
-title: "def blog"
+title: "wjy's blooooooooog"
 url: "//tmpurl.pw"
 paginate: 10
 author:
@@ -12,7 +12,7 @@ author:
     googleplus:
     weibo: zero7kdang
 atom_path: /atom.xml
-rss_path: /rss.xml
+
 
 # Build settings
 kramdown:
