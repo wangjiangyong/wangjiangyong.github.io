@@ -27,3 +27,12 @@ gem install rake
 rake介绍
 ###############################
 http://blog.csdn.net/freehyan/article/details/51879554
+
+Markdown 图片&链接
+#####################
+<img src="url of images" width="100" height="100" />   调整大小
+<div align=center>      图片居中，模版默认居中
+![name](url)
+</div>
+
+![name][url]  链接 
