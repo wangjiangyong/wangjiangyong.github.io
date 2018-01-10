@@ -14,7 +14,14 @@ tags: [Python, FFmpeg, Video]
 + 将拆分的图片帧转换为Numpy.array提供给模型处理；
 + 将处理后的图片帧序列推流到服务器。
 
+#### 相关第三方库
 
+#### 可行方案
+
+关键点是在Python3代码中，通过**Pipe(管道)来使外部ffmpeg程序读写视频帧**。
+
+
+参考：http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
 
 
 
