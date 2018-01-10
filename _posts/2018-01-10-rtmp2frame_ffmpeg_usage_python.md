@@ -59,9 +59,9 @@ while True:
     proc2stream.stdin.write(image.tostring())
 ```
 以上代码可实现从数据流提取数据帧，并将提取的帧写入output_video.flv文件。使用一下命令将文件进行推流：
-
+```bash
 ffmpeg -re -i output_video.flv -f flv rtmp://192.168.xxx.xxx/live/livestream2 
-
+```
 
 参考：
 1. http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/     
