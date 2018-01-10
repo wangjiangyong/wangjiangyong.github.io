@@ -4,7 +4,7 @@ title: "Fedora大战Ubuntu"
 category: Linux
 tags: [Linux, Fedora, Ubuntu]
 ---
-<img src="https://raw.githubusercontent.com/wangjiangyong/wangjiangyong.github.io/master/assets/images/fudiff.jpg" width="100" height="100" />
+<img src="https://raw.githubusercontent.com/wangjiangyong/wangjiangyong.github.io/master/assets/images/fudiff.jpg" width="250" height="250" />
 
 ### 介绍
 
