@@ -55,7 +55,7 @@ sudo make install
 python3
 >>> import cv2
 >>> cv2.__version__
-'3.2.0-dev'
+'3.2.0'
 
 # 直接安装可能需要的包
 sudo apt-get install python3-numpy
