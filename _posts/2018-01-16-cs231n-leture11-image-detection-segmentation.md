@@ -34,10 +34,13 @@ tags: [Image, DeepLearning]
 **人体姿势估计（Human Pose Estimation）**
 
 图像中固定几个点的思路：除了分类和定位，还可以应用到人体姿势估计（Human Pose Estimation）上
+
 输入：人像图片
+
 输出：人体关节的点位（假定14个关节点位），网络预测人体姿势
 
 <img src="https://raw.githubusercontent.com/wangjiangyong/wangjiangyong.github.io/master/assets/images/humanposeestimation.jpg" width="550" height="256" />
 
 回归损失：L2欧几里得损失，（平滑）L1损失
+
 分类问题，考虑交叉熵损失，softmax损失或SVM边界类型损失。
