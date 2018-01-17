@@ -44,3 +44,42 @@ tags: [Image, DeepLearning]
 回归损失：L2欧几里得损失，（平滑）L1损失
 
 分类问题，考虑交叉熵损失，softmax损失或SVM边界类型损失。
+
+
+#### 对象检测
+
+**对象检测（object detection）**，计算机视觉核心领域
+
+输入：图像
+
+输出：根据固定类别，每当图像中出现其中类别的对象时，围绕对象画框（box），并预测从属类别。与分类定位不同，因为每张输入图片其中的**对象是不固定**，所以此问题具有挑战性。
+
+
+可行方法：
+1. 使用滑动窗口。如何选择窗口（图块）大小？ 复杂度特别高
+
+2. 候选区域（region proposals）
+
+**R-CNN** （基于候选框的目标检测模型），使用region proposal network寻找备选区域，（也叫兴趣区域或ROI）
+可以得到大概2k的ROI，但是ROI尺寸不同，为了进入CNN，调整备选区域为固定尺寸。基于区域选择的CNN（R-CNN）可以做回归，用于矫正对象外的框（bounding box），不光对这些备选区域进行分类，还对边界进行预测和调整。是多任务损失。
+
+R-CNN问题：效率低，时间空间复杂度很高
+
+<img src="https://raw.githubusercontent.com/wangjiangyong/wangjiangyong.github.io/master/assets/images/rcnn.jpg" width="550" height="256" />
+
+**Fast R-CNN**:不在按ROI处理，先通过一些卷积层网络，对于feature map再使用备选区域，Selective Search选择搜索。
+<img src="https://raw.githubusercontent.com/wangjiangyong/wangjiangyong.github.io/master/assets/images/fastrcnn.jpg" width="892" height="256" />
+
+**Faster R-CNN**
+<img src="https://raw.githubusercontent.com/wangjiangyong/wangjiangyong.github.io/master/assets/images/fasterrcnn.jpg" width="550" height="256" />
+
+3. Detection without Proposals ：YOLO/SSD
+
+#### 图像分割 
+**图像分割 Instance segmentation**
+
+输入：图像
+
+输出：类似于对象检测，还需要预测出整个分割区域。对象检测+语义分割
+
+**Mask R-CNN**，效果很好
