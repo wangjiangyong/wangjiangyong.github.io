@@ -8,4 +8,4 @@ tags: [DeepLearning,Image]
 #### 介绍
 
 LeNet卷积网络
-<img src="https://raw.githubusercontent.com/wangjiangyong/wangjiangyong.github.io/master/assets/images/lenet.png" width="550" height="256" />
+<img src="https://raw.githubusercontent.com/wangjiangyong/wangjiangyong.github.io/master/assets/images/lenet.png" width="612" height="256" />
