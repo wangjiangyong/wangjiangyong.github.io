@@ -16,5 +16,5 @@ sudo ldconfig 使链接生效
 ```
 
 详情：
-https://stackoverflow.com/questions/4754633/linux-program-cant-find-shared-library-at-run-time
-https://www.cyberciti.biz/tips/linux-shared-library-management.html
++ https://stackoverflow.com/questions/4754633/linux-program-cant-find-shared-library-at-run-time
++ https://www.cyberciti.biz/tips/linux-shared-library-management.html
