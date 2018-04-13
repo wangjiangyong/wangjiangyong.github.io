@@ -49,6 +49,14 @@ sudo make install
 
 ```
 
+####OpenCV(Python)
+```
+# 已经装了Anaconda，需如下命令
+pip install opencv-python
+# 否则，使用
+# pip install python-opencv
+```
+
 #### 验证安装
 
 ```bash
@@ -66,7 +74,7 @@ sudo apt-get install python3-matplotlib
 + http://cyaninfinite.com/tutorials/installing-opencv-in-ubuntu-for-python-3/
 + https://docs.opencv.org/trunk/d2/de6/tutorial_py_setup_in_ubuntu.html
 + https://www.pyimagesearch.com/2015/06/22/install-opencv-3-0-and-python-2-7-on-ubuntu/
-
++ http://www.linuxdiyf.com/linux/30410.html
 
 
 
