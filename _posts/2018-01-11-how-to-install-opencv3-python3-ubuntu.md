@@ -49,7 +49,7 @@ sudo make install
 
 ```
 
-####OpenCV(Python)
+#### OpenCV(Python)
 ```
 # 已经装了Anaconda，需如下命令
 pip install opencv-python
