@@ -57,6 +57,8 @@ python3
 >>> cv2.__version__
 '3.2.0'
 
+```
+
 #### python3.6(基于Anaconda)
 ```
 # 已经装了Anaconda，需如下命令
