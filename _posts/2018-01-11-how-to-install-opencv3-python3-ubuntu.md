@@ -67,7 +67,7 @@ pip install opencv-python
 # pip install python-opencv
 ```
 
-
+```
 # 直接安装可能需要的包
 sudo apt-get install python3-numpy
 sudo apt-get install python3-matplotlib
