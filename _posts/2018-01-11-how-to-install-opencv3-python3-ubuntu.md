@@ -49,7 +49,15 @@ sudo make install
 
 ```
 
-#### OpenCV(Python)
+#### 验证安装（基于local python3.5）
+
+```bash
+python3
+>>> import cv2
+>>> cv2.__version__
+'3.2.0'
+
+#### python3.6(基于Anaconda)
 ```
 # 已经装了Anaconda，需如下命令
 pip install opencv-python
@@ -57,13 +65,6 @@ pip install opencv-python
 # pip install python-opencv
 ```
 
-#### 验证安装
-
-```bash
-python3
->>> import cv2
->>> cv2.__version__
-'3.2.0'
 
 # 直接安装可能需要的包
 sudo apt-get install python3-numpy
