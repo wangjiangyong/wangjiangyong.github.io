@@ -94,6 +94,7 @@ net = slim.conv2d(input, 128, [3, 3], scope='conv1_1')
 ```
 
 TF-Slim为构建神经网络的众多组件提供了标准实现。包括：
+
 Layer | TF-Slim
 ------- | --------
 BiasAdd  | [slim.bias_add](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
