@@ -66,4 +66,96 @@ my_model_variable = CreateViaCustomCode()
 slim.add_model_variable(my_model_variable)
 ```
 
+##### Layers
+虽然TF有大量的运算操作集，但神经网络开发者通常根据"layers", "losses", "metrics",和"networks"高层次的概念来考虑模型。比如卷积层、全连接层或者BatchNorm层都是比TF运算操作更抽象。
+而且不像更原生的操作，网络层一般还包含相关的变量。比如卷积层由如下一系列低级操作组成：
+1. 创建weight和bias变量
+2. 使用上层网络的输出作为输入进行卷积运算
+3. 卷积结果加上偏移值
+4. 使用激活函数
+
+使用原生TF代码，这将比较繁琐：
+```python
+input = ...
+with tf.name_scope('conv1_1') as scope:
+  kernel = tf.Variable(tf.truncated_normal([3, 3, 64, 128], dtype=tf.float32,
+                                           stddev=1e-1), name='weights')
+  conv = tf.nn.conv2d(input, kernel, [1, 1, 1, 1], padding='SAME')
+  biases = tf.Variable(tf.constant(0.0, shape=[128], dtype=tf.float32),
+                       trainable=True, name='biases')
+  bias = tf.nn.bias_add(conv, biases)
+  conv1 = tf.nn.relu(bias, name=scope)
+```
+
+为了减少这些重复的代码，在神经网络层的更抽象层次上TF-Slim提供了许多方便的操作。比如如上代码可以简化为：
+```python
+input = ...
+net = slim.conv2d(input, 128, [3, 3], scope='conv1_1')
+```
+
+TF-Slim为构建神经网络的众多组件提供了标准实现。包括：
+Layer | TF-Slim
+------- | --------
+BiasAdd  | [slim.bias_add](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+BatchNorm  | [slim.batch_norm](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+Conv2d | [slim.conv2d](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+Conv2dInPlane | [slim.conv2d_in_plane](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+Conv2dTranspose (Deconv) | [slim.conv2d_transpose](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+FullyConnected | [slim.fully_connected](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+AvgPool2D | [slim.avg_pool2d](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+Dropout| [slim.dropout](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+Flatten | [slim.flatten](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+MaxPool2D | [slim.max_pool2d](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+OneHotEncoding | [slim.one_hot_encoding](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+SeparableConv2 | [slim.separable_conv2d](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+UnitNorm | [slim.unit_norm](https://www.tensorflow.org/code/tensorflow/contrib/layers/python/layers/layers.py)
+
+TF-Slim也提供了repeat和stack两种元操作，允许用户重复执行相同的操作。例如，VGG网络中的以下片段：
+```python
+net = ...
+net = slim.conv2d(net, 256, [3, 3], scope='conv3_1')
+net = slim.conv2d(net, 256, [3, 3], scope='conv3_2')
+net = slim.conv2d(net, 256, [3, 3], scope='conv3_3')
+net = slim.max_pool2d(net, [2, 2], scope='pool2')
+```
+
+一种方法是使用循环减少代码冗余：
+```python
+net = ...
+for i in range(3):
+  net = slim.conv2d(net, 256, [3, 3], scope='conv3_%d' % (i+1))
+net = slim.max_pool2d(net, [2, 2], scope='pool2')
+```
+当然也可以使用TF-Slim的repeat操作
+```python
+net = slim.repeat(net, 3, slim.conv2d, 256, [3, 3], scope='conv3')
+net = slim.max_pool2d(net, [2, 2], scope='pool2')
+```
+
+注意slim.repeat不仅适用于相同参数，它还可以合理地为调用的slim.conv2d设置scopes。
+更具体地说，上面的例子中的scope将被命名为'conv3/conv3_1'，'conv3/conv3_2'和'conv3/conv3_3'。
+
+此外，TF-Slim的slim.stack操作允许调用者重复使用不同参数的相同操作来创建stack or tower of layers。slim.stack为新创建的操作也创建新的tf.variable_scope。
+比如创建简单的多层感知器：
+```python
+# Verbose way:
+x = slim.fully_connected(x, 32, scope='fc/fc_1')
+x = slim.fully_connected(x, 64, scope='fc/fc_2')
+x = slim.fully_connected(x, 128, scope='fc/fc_3')
+
+# Equivalent, TF-Slim way using slim.stack:
+slim.stack(x, slim.fully_connected, [32, 64, 128], scope='fc')
+```
+
+更多的例子如下(Similarly, one can use stack to simplify a tower of multiple convolutions)：
+```python
+# Verbose way:
+x = slim.conv2d(x, 32, [3, 3], scope='core/core_1')
+x = slim.conv2d(x, 32, [1, 1], scope='core/core_2')
+x = slim.conv2d(x, 64, [3, 3], scope='core/core_3')
+x = slim.conv2d(x, 64, [1, 1], scope='core/core_4')
+
+# Using stack:
+slim.stack(x, slim.conv2d, [(32, [3, 3]), (32, [1, 1]), (64, [3, 3]), (64, [1, 1])], scope='core')
+```
 
