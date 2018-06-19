@@ -160,3 +160,115 @@ x = slim.conv2d(x, 64, [1, 1], scope='core/core_4')
 slim.stack(x, slim.conv2d, [(32, [3, 3]), (32, [1, 1]), (64, [3, 3]), (64, [1, 1])], scope='core')
 ```
 
+##### Scopes
+除了TF中作用域机制类型(name_scope, variable_scope)外，TF-Slim还添加了一个名为arg_scope的新作用域机制。
+这个新的作用域允许用户指定一个或多个操作和一系列参数，这些参数将被传递给arg_scope中定义的每个操作。考虑下面的代码片段：
+```python
+net = slim.conv2d(inputs, 64, [11, 11], 4, padding='SAME',
+                  weights_initializer=tf.truncated_normal_initializer(stddev=0.01),
+                  weights_regularizer=slim.l2_regularizer(0.0005), scope='conv1')
+net = slim.conv2d(net, 128, [11, 11], padding='VALID',
+                  weights_initializer=tf.truncated_normal_initializer(stddev=0.01),
+                  weights_regularizer=slim.l2_regularizer(0.0005), scope='conv2')
+net = slim.conv2d(net, 256, [11, 11], padding='SAME',
+                  weights_initializer=tf.truncated_normal_initializer(stddev=0.01),
+                  weights_regularizer=slim.l2_regularizer(0.0005), scope='conv3')
+```
+
+由上可知三个卷积层共享了需用相同的参数。两个卷积层拥有相同padding，所有三个卷积层拥有相同weights_initializer和weight_regularizer。
+以上代码很难阅读，并且包含很多重复的值，这些值应该被分解出来。一种解决方案是使用变量指定默认值：
+```python
+padding = 'SAME'
+initializer = tf.truncated_normal_initializer(stddev=0.01)
+regularizer = slim.l2_regularizer(0.0005)
+net = slim.conv2d(inputs, 64, [11, 11], 4,
+                  padding=padding,
+                  weights_initializer=initializer,
+                  weights_regularizer=regularizer,
+                  scope='conv1')
+net = slim.conv2d(net, 128, [11, 11],
+                  padding='VALID',
+                  weights_initializer=initializer,
+                  weights_regularizer=regularizer,
+                  scope='conv2')
+net = slim.conv2d(net, 256, [11, 11],
+                  padding=padding,
+                  weights_initializer=initializer,
+                  weights_regularizer=regularizer,
+                  scope='conv3')
+```
+
+该解决方案确保所有三个卷积共享完全相同的参数值，但这不会完全消除代码混乱。
+通过使用arg_scope，我们可以确保每个图层使用相同的值并简化代码：
+```python
+  with slim.arg_scope([slim.conv2d], padding='SAME',
+                      weights_initializer=tf.truncated_normal_initializer(stddev=0.01)
+                      weights_regularizer=slim.l2_regularizer(0.0005)):
+    net = slim.conv2d(inputs, 64, [11, 11], scope='conv1')
+    net = slim.conv2d(net, 128, [11, 11], padding='VALID', scope='conv2')
+    net = slim.conv2d(net, 256, [11, 11], scope='conv3')
+```
+注意以上代码中，参数值被arg_scope设置，但是可以被局部修改。padding已被设置为SAME，第二个卷积层将其设置为VALID。
+arg_scopes也可以被嵌套，在同一scope中使用多操作，例如：
+```python
+with slim.arg_scope([slim.conv2d, slim.fully_connected],
+                      activation_fn=tf.nn.relu,
+                      weights_initializer=tf.truncated_normal_initializer(stddev=0.01),
+                      weights_regularizer=slim.l2_regularizer(0.0005)):
+  with slim.arg_scope([slim.conv2d], stride=1, padding='SAME'):
+    net = slim.conv2d(inputs, 64, [11, 11], 4, padding='VALID', scope='conv1')
+    net = slim.conv2d(net, 256, [5, 5],
+                      weights_initializer=tf.truncated_normal_initializer(stddev=0.03),
+                      scope='conv2')
+    net = slim.fully_connected(net, 1000, activation_fn=None, scope='fc')
+```
+
+
+##### 例子：VGG16图层
+结合TF-Slim Variables, Operations and scopes，可以使用很少的代码行编写一个常见的复杂网络。例如，整个VGG可以通过以下代码片段来定义：
+```python
+def vgg16(inputs):
+  with slim.arg_scope([slim.conv2d, slim.fully_connected],
+                      activation_fn=tf.nn.relu,
+                      weights_initializer=tf.truncated_normal_initializer(0.0, 0.01),
+                      weights_regularizer=slim.l2_regularizer(0.0005)):
+    net = slim.repeat(inputs, 2, slim.conv2d, 64, [3, 3], scope='conv1')
+    net = slim.max_pool2d(net, [2, 2], scope='pool1')
+    net = slim.repeat(net, 2, slim.conv2d, 128, [3, 3], scope='conv2')
+    net = slim.max_pool2d(net, [2, 2], scope='pool2')
+    net = slim.repeat(net, 3, slim.conv2d, 256, [3, 3], scope='conv3')
+    net = slim.max_pool2d(net, [2, 2], scope='pool3')
+    net = slim.repeat(net, 3, slim.conv2d, 512, [3, 3], scope='conv4')
+    net = slim.max_pool2d(net, [2, 2], scope='pool4')
+    net = slim.repeat(net, 3, slim.conv2d, 512, [3, 3], scope='conv5')
+    net = slim.max_pool2d(net, [2, 2], scope='pool5')
+    net = slim.fully_connected(net, 4096, scope='fc6')
+    net = slim.dropout(net, 0.5, scope='dropout6')
+    net = slim.fully_connected(net, 4096, scope='fc7')
+    net = slim.dropout(net, 0.5, scope='dropout7')
+    net = slim.fully_connected(net, 1000, activation_fn=None, scope='fc8')
+  return net
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
