@@ -250,10 +250,72 @@ def vgg16(inputs):
   return net
 ```
 
+#### 训练模型
+训练TF模型需要模型、loss函数、梯度计算，以及迭代地计算loss相关的模型权重梯度并相应地更新梯度的训练过程。
+TF-Slim提供了常见的loss函数和运行训练、验证过程中的一系列辅助函数。
 
+##### Losses
+loss函数定义了期望优化的数量。对于分类问题，常用的就是类别间实际分布和预测概率分布之间的交叉熵。对于回归问题，通常使用预测值和真实值的误差平方和。      
+一些多任务学习模型，需要同时使用多loss函数。换句话说，最小化的loss函数是多个loss函数之和。比如，不仅预测图片中场景类型，还有每个像素的相机深度。
+这个模型的loss函数将会是分类loss和深度预测loss之和。      
+TF-Slim提供了通过losses模块简单地定义和追踪loss函数的机制。考虑如下训练VGG网络的例子：
+```python
+import tensorflow as tf
+import tensorflow.contrib.slim.nets as nets
+vgg = nets.vgg
 
+# Load the images and labels.
+images, labels = ...
 
+# Create the model.
+predictions, _ = vgg.vgg_16(images)
 
+# Define the loss functions and get the total loss.
+loss = slim.losses.softmax_cross_entropy(predictions, labels)
+```
+以上例子中，使用了TF-Slim实现的VGG来创建模型，并加入了标准的分类损失。      
+下面的例子是多任务模型的情形：
+```python
+# Load the images and labels.
+images, scene_labels, depth_labels = ...
+
+# Create the model.
+scene_predictions, depth_predictions = CreateMultiTaskModel(images)
+
+# Define the loss functions and get the total loss.
+classification_loss = slim.losses.softmax_cross_entropy(scene_predictions, scene_labels)
+sum_of_squares_loss = slim.losses.sum_of_squares(depth_predictions, depth_labels)
+
+# The following two lines have the same effect:
+total_loss = classification_loss + sum_of_squares_loss
+total_loss = slim.losses.get_total_loss(add_regularization_losses=False)
+```
+以上列子中，使用了slim.losses.softmax_cross_entropy和slim.losses.sum_of_squares两种loss。并调用slim.losses.get_total_loss()来得到总的loss。
+当使用TF-Slim创建loss函数，TF-Slim将loss添加到特定的TF loss函数集合，这样可以使用户既可以人工管理总loss，也可以让TF-Slim来辅助管理。        
+
+当希望使用TF-Slim来管理定制的loss函数，loss_ops.py提供函数来添加loss到TF-Slim集合，如下例子：
+```python
+# Load the images and labels.
+images, scene_labels, depth_labels, pose_labels = ...
+
+# Create the model.
+scene_predictions, depth_predictions, pose_predictions = CreateMultiTaskModel(images)
+
+# Define the loss functions and get the total loss.
+classification_loss = slim.losses.softmax_cross_entropy(scene_predictions, scene_labels)
+sum_of_squares_loss = slim.losses.sum_of_squares(depth_predictions, depth_labels)
+pose_loss = MyCustomLossFunction(pose_predictions, pose_labels)
+slim.losses.add_loss(pose_loss) # Letting TF-Slim know about the additional loss.
+
+# The following two ways to compute the total loss are equivalent:
+regularization_loss = tf.add_n(slim.losses.get_regularization_losses())
+total_loss1 = classification_loss + sum_of_squares_loss + pose_loss + regularization_loss
+
+# (Regularization Loss is included in the total loss by default).
+total_loss2 = slim.losses.get_total_loss()
+```
+
+##### Training Loop
 
 
 
