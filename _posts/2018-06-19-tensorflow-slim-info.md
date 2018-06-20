@@ -26,7 +26,7 @@ arg_scope data evaluation layers learning losses metrics nets queues regularizer
 使用TF-Slim的variables, layers and scopes可以方便地定义模型。
 
 ##### Variables
-原生TensorFlow中创建Variables需要预先定义值或者初始化机制（比如高斯随机采样）。为了减少创建变量的代码量，TF-Slim提供了一系列简单封装函数。
+原生TensorFlow中创建Variables需要预先定义值或者初始化机制（比如高斯随机采样）。为了减少创建变量的代码量，TF-Slim提供了一系列简单封装函数。                
 例如，创建weights变量，使用截断正态分布初始化，使用l2_loss正则化并放置在CPU上，只用使用如下语句：
 ```python
 weights = slim.variable('weights',
@@ -37,7 +37,7 @@ weights = slim.variable('weights',
 ```
 
 原生TF中有两类变量：普通变量(regular variables)和局部变量(local (transient) variables)。大部分变量都是普通变量，一旦创建就可以使用saver将其保存在硬盘上。
-局部变量只存在于会话期间并且不保存在硬盘上。
+局部变量只存在于会话期间并且不保存在硬盘上。                    
 TF-Slim进一步定义model variables，此变量表示模型参数，训练和导入的模型参数。Non-model variables指在训练和验证中所有其他变量，他们在实际执行推断时不再需要。
 比如global_step在训练和验证时候使用，但它实际不是模型中的一部分。
 
@@ -161,7 +161,7 @@ slim.stack(x, slim.conv2d, [(32, [3, 3]), (32, [1, 1]), (64, [3, 3]), (64, [1, 1
 ```
 
 ##### Scopes
-除了TF中作用域机制类型(name_scope, variable_scope)外，TF-Slim还添加了一个名为arg_scope的新作用域机制。
+除了TF中作用域机制类型(name_scope, variable_scope)外，TF-Slim还添加了一个名为arg_scope的新作用域机制。                      
 这个新的作用域允许用户指定一个或多个操作和一系列参数，这些参数将被传递给arg_scope中定义的每个操作。考虑下面的代码片段：
 ```python
 net = slim.conv2d(inputs, 64, [11, 11], 4, padding='SAME',
@@ -316,6 +316,87 @@ total_loss2 = slim.losses.get_total_loss()
 ```
 
 ##### Training Loop
+TF-Slim在learning.py中提供了训练模型的简单强大的工具集。其中包括Train函数，它可重复地测量loss，计算梯度和保存模型到硬盘以及一些便捷操作梯度的函数。比如，一旦指定了模型
+、loss函数和优化模式，就可以调用slim.learning.create_train_op和slim.learning.train来实现优化过程：
+```python
+g = tf.Graph()
+
+# Create the model and specify the losses...
+...
+
+total_loss = slim.losses.get_total_loss()
+optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+
+# create_train_op ensures that each time we ask for the loss, the update_ops
+# are run and the gradients being computed are applied too.
+train_op = slim.learning.create_train_op(total_loss, optimizer)
+logdir = ... # Where checkpoints are stored.
+
+slim.learning.train(
+    train_op,
+    logdir, # specifies the directory where the checkpoints and event files are stored.
+    number_of_steps=1000, #  limit the number of gradient steps taken to 1000
+    save_summaries_secs=300, # indicates that compute summaries every 5 minutes
+    save_interval_secs=600): # indicates that save a model checkpoint every 10 minutes
+```
+
+##### Working Example: Training the VGG16 Model
+```python
+import tensorflow as tf
+import tensorflow.contrib.slim.nets as nets
+
+slim = tf.contrib.slim
+vgg = nets.vgg
+
+...
+
+train_log_dir = ...
+if not tf.gfile.Exists(train_log_dir):
+  tf.gfile.MakeDirs(train_log_dir)
+
+with tf.Graph().as_default():
+  # Set up the data loading:
+  images, labels = ...
+
+  # Define the model:
+  predictions = vgg.vgg_16(images, is_training=True)
+
+  # Specify the loss function:
+  slim.losses.softmax_cross_entropy(predictions, labels)
+
+  total_loss = slim.losses.get_total_loss()
+  tf.summary.scalar('losses/total_loss', total_loss)
+
+  # Specify the optimization scheme:
+  optimizer = tf.train.GradientDescentOptimizer(learning_rate=.001)
+
+  # create_train_op that ensures that when we evaluate it to get the loss,
+  # the update_ops are done and the gradient updates are computed.
+  train_tensor = slim.learning.create_train_op(total_loss, optimizer)
+
+  # Actually runs training.
+  slim.learning.train(train_tensor, train_log_dir)
+```
+
+#### Fine-Tuning Existing Models
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
