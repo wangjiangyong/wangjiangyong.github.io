@@ -379,22 +379,233 @@ with tf.Graph().as_default():
 ```
 
 #### Fine-Tuning Existing Models
+##### 从检查点恢复变量概述
+模型被训练后，可以调用tf.train.Saver()恢复模型。tf.train.Saver()将从给定的检查点恢复Variables。很多情况下，tf.train.Saver()提供了恢复所有或部分变量的简单机制。
+```python
+# Create some variables.
+v1 = tf.Variable(..., name="v1")
+v2 = tf.Variable(..., name="v2")
+...
+# Add ops to restore all the variables.
+restorer = tf.train.Saver()
+
+# Add ops to restore some variables.
+restorer = tf.train.Saver([v1, v2])
+
+# Later, launch the model, use the saver to restore variables from disk, and
+# do some work with the model.
+with tf.Session() as sess:
+  # Restore variables from disk.
+  restorer.restore(sess, "/tmp/model.ckpt")
+  print("Model restored.")
+  # Do some work with the model
+  ...
+```
+
+##### 部分恢复模型
+很多情况下，需要在新数据集上微调预训练模型。这种情形下，可以使用TF-Slim的helper函数来选择需要恢复的变量。
+```python
+# Create some variables.
+v1 = slim.variable(name="v1", ...)
+v2 = slim.variable(name="nested/v2", ...)
+...
+
+# Get list of variables to restore (which contains only 'v2'). These are all
+# equivalent methods:
+variables_to_restore = slim.get_variables_by_name("v2")
+# or
+variables_to_restore = slim.get_variables_by_suffix("2")
+# or
+variables_to_restore = slim.get_variables(scope="nested")
+# or
+variables_to_restore = slim.get_variables_to_restore(include=["nested"])
+# or
+variables_to_restore = slim.get_variables_to_restore(exclude=["v1"])
+
+# Create the saver which will be used to restore the variables.
+restorer = tf.train.Saver(variables_to_restore)
+
+with tf.Session() as sess:
+  # Restore variables from disk.
+  restorer.restore(sess, "/tmp/model.ckpt")
+  print("Model restored.")
+  # Do some work with the model
+  ...
+```
 
 
+##### 使用不同变量名恢复模型
+从检查点恢复变量时，Saver在检查文件中定位变量名同时映射它们到当前计算图中的变量。      
+当检查点文件中的变量名与计算图中的匹配，这种情况可以正常运行。然而，不匹配时，需要给Saver提供映射检查点文件变量名与计算图中变量关系的字典。如下例子：
+```python
+# Assuming than 'conv1/weights' should be restored from 'vgg16/conv1/weights'
+def name_in_checkpoint(var):
+  return 'vgg16/' + var.op.name
+
+# Assuming than 'conv1/weights' and 'conv1/bias' should be restored from 'conv1/params1' and 'conv1/params2'
+def name_in_checkpoint(var):
+  if "weights" in var.op.name:
+    return var.op.name.replace("weights", "params1")
+  if "bias" in var.op.name:
+    return var.op.name.replace("bias", "params2")
+
+variables_to_restore = slim.get_model_variables()
+variables_to_restore = {name_in_checkpoint(var):var for var in variables_to_restore}
+restorer = tf.train.Saver(variables_to_restore)
+
+with tf.Session() as sess:
+  # Restore variables from disk.
+  restorer.restore(sess, "/tmp/model.ckpt")
+```
 
 
+##### 在不同任务上微调模型
+如下情形，当已经拥有了预训练的VGG16模型。模型在拥有1000类别的ImageNet数据集上训练得到。现在需要将其用在只有20类别的Pascal VOC数据上。     
+为了实现以上需求，首先使用预训练模型的值初始化新模型，包括最后一层的初始化：
+```python
+# Load the Pascal VOC data
+image, label = MyPascalVocDataLoader(...)
+images, labels = tf.train.batch([image, label], batch_size=32)
+
+# Create the model
+predictions = vgg.vgg_16(images)
+
+train_op = slim.learning.create_train_op(...)
+
+# Specify where the Model, trained on ImageNet, was saved.
+model_path = '/path/to/pre_trained_on_imagenet.checkpoint'
+
+# Specify where the new model will live:
+log_dir = '/path/to/my_pascal_model_dir/'
+
+# Restore only the convolutional layers:
+variables_to_restore = slim.get_variables_to_restore(exclude=['fc6', 'fc7', 'fc8'])
+init_fn = assign_from_checkpoint_fn(model_path, variables_to_restore)
+
+# Start training.
+slim.learning.train(train_op, log_dir, init_fn=init_fn)
+```
+
+#### 评估模型
+已经训练好模型（甚至模型训练时）都希望看到模型实际的效果如何。可以使一系列评估指标来给模型打分。评估代码主要执行加载数据、完成推测、对比实际结果和记录评估分数。
+这些步骤可以执行一次或者周期性执行。
+##### Metrics
+定义指标来衡量性能，但它不是loss函数（loss函数在训练过程中直接被优化）。但是在评估模型中关注的是什么呢。比如，我们希望最小化log loss，但是关注的是使用F1分数（测试准确度），或者是Intersection Over Union score？         
+TF-Slim提供了一系列使评估模型简单的指标操作。计算指标值可以分为以下三步：
++ 初始化：初始化用来计算指标的变量
++ 聚合：实现用来计算指标的操作
++ 最后：（可选）完成任何最后操作来计算指标值。比如，计算平局值、最小/最大值等等
+
+比如，计算mean_absolute_error，两个变量count和total初始化为零。在聚合过程中，得到预测值和标签值，用来计算差值的绝对值之和，并赋值给total。每次得到不同count值。最后，使用total除以count来得到平均值。          
+如下示例代码展示申明指标的API：（指标是在测试集上进行评估）
+```python
+images, labels = LoadTestData(...)
+predictions = MyModel(images)
+
+mae_value_op, mae_update_op = slim.metrics.streaming_mean_absolute_error(predictions, labels)
+mre_value_op, mre_update_op = slim.metrics.streaming_mean_relative_error(predictions, labels)
+pl_value_op, pl_update_op = slim.metrics.percentage_less(mean_relative_errors, 0.3)
+```
+以上示例中，创建指标后返回两个值：value_op 和 update_op。value_op是idempotent?操作，返回当前指标值。update_op操作返回聚合步骤所提到的指标值。            
+追踪每步的value_op 和 update_op较为繁杂，为了解决此问题，TF-Slim提供了两个便捷的函数：
+```python
+# Aggregates the value and update ops in two lists:
+value_ops, update_ops = slim.metrics.aggregate_metrics(
+    slim.metrics.streaming_mean_absolute_error(predictions, labels),
+    slim.metrics.streaming_mean_squared_error(predictions, labels))
+
+# Aggregates the value and update ops in two dictionaries:
+names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
+    "eval/mean_absolute_error": slim.metrics.streaming_mean_absolute_error(predictions, labels),
+    "eval/mean_squared_error": slim.metrics.streaming_mean_squared_error(predictions, labels),
+})
+```
+
+##### Working example: Tracking Multiple Metrics
+```python
+import tensorflow as tf
+import tensorflow.contrib.slim.nets as nets
+
+slim = tf.contrib.slim
+vgg = nets.vgg
 
 
+# Load the data
+images, labels = load_data(...)
+
+# Define the network
+predictions = vgg.vgg_16(images)
+
+# Choose the metrics to compute:
+names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
+    "eval/mean_absolute_error": slim.metrics.streaming_mean_absolute_error(predictions, labels),
+    "eval/mean_squared_error": slim.metrics.streaming_mean_squared_error(predictions, labels),
+})
+
+# Evaluate the model using 1000 batches of data:
+num_batches = 1000
+
+with tf.Session() as sess:
+  sess.run(tf.global_variables_initializer())
+  sess.run(tf.local_variables_initializer())
+
+  for batch_id in range(num_batches):
+    sess.run(names_to_updates.values())
+
+  metric_values = sess.run(names_to_values.values())
+  for metric, value in zip(names_to_values.keys(), metric_values):
+    print('Metric %s has value: %f' % (metric, value))
+```
+
+##### Evaluation Loop
+TF-Slim提供了评估模块（evaluation.py），包括了使用metric_ops.py模块中的指标来编写评估脚本的helper函数。这些包括了周期运行评估、评估批数据指标、打印和概述指标结果。      
+示例如下：
+```python
+import tensorflow as tf
+
+slim = tf.contrib.slim
+
+# Load the data
+images, labels = load_data(...)
+
+# Define the network
+predictions = MyModel(images)
+
+# Choose the metrics to compute:
+names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
+    'accuracy': slim.metrics.accuracy(predictions, labels),
+    'precision': slim.metrics.precision(predictions, labels),
+    'recall': slim.metrics.recall(mean_relative_errors, 0.3),
+})
+
+# Create the summary ops such that they also print out to std output:
+summary_ops = []
+for metric_name, metric_value in names_to_values.iteritems():
+  op = tf.summary.scalar(metric_name, metric_value)
+  op = tf.Print(op, [metric_value], metric_name)
+  summary_ops.append(op)
+
+num_examples = 10000
+batch_size = 32
+num_batches = math.ceil(num_examples / float(batch_size))
+
+# Setup the global step.
+slim.get_or_create_global_step()
+
+output_dir = ... # Where the summaries are stored.
+eval_interval_secs = ... # How often to run the evaluation.
+slim.evaluation.evaluation_loop(
+    'local',
+    checkpoint_dir,
+    log_dir,
+    num_evals=num_batches,
+    eval_op=names_to_updates.values(),
+    summary_op=tf.summary.merge(summary_ops),
+    eval_interval_secs=eval_interval_secs)
+```
 
 
-
-
-
-
-
-
-
-
+原文：https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/slim/README.md
 
 
 
