@@ -378,8 +378,8 @@ with tf.Graph().as_default():
   slim.learning.train(train_tensor, train_log_dir)
 ```
 
-#### Fine-Tuning Existing Models
-##### 从检查点恢复变量概述
+#### 微调已有模型
+##### Brief Recap on Restoring Variables from a Checkpoint
 模型被训练后，可以调用tf.train.Saver()恢复模型。tf.train.Saver()将从给定的检查点恢复Variables。很多情况下，tf.train.Saver()提供了恢复所有或部分变量的简单机制。
 ```python
 # Create some variables.
@@ -402,7 +402,7 @@ with tf.Session() as sess:
   ...
 ```
 
-##### 部分恢复模型
+##### Partially Restoring Models
 很多情况下，需要在新数据集上微调预训练模型。这种情形下，可以使用TF-Slim的helper函数来选择需要恢复的变量。
 ```python
 # Create some variables.
@@ -434,7 +434,7 @@ with tf.Session() as sess:
 ```
 
 
-##### 使用不同变量名恢复模型
+##### Restoring models with different variable names
 从检查点恢复变量时，Saver在检查文件中定位变量名同时映射它们到当前计算图中的变量。      
 当检查点文件中的变量名与计算图中的匹配，这种情况可以正常运行。然而，不匹配时，需要给Saver提供映射检查点文件变量名与计算图中变量关系的字典。如下例子：
 ```python
@@ -459,7 +459,7 @@ with tf.Session() as sess:
 ```
 
 
-##### 在不同任务上微调模型
+##### Fine-Tuning a Model on a different task
 如下情形，当已经拥有了预训练的VGG16模型。模型在拥有1000类别的ImageNet数据集上训练得到。现在需要将其用在只有20类别的Pascal VOC数据上。     
 为了实现以上需求，首先使用预训练模型的值初始化新模型，包括最后一层的初始化：
 ```python
