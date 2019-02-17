@@ -5,5 +5,4 @@ category: Linux
 tags: [Linux,Security]
 ---
 
-#### CSDN文章
- [早期CSDN博客文章](https://blog.csdn.net/wjyph)
+[早期CSDN博客文章](https://blog.csdn.net/wjyph)
